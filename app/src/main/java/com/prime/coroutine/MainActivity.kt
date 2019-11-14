@@ -5,11 +5,19 @@ import android.os.Bundle
 
 import android.widget.ProgressBar
 import android.widget.Toast
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProvider
+
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.coroutines.*
 import kotlinx.coroutines.Dispatchers.IO
 
 import kotlinx.coroutines.Dispatchers.Main
+
+import android.app.Activity
+import android.content.Intent
+import android.util.Log
+
 
 class MainActivity : AppCompatActivity() {
     private lateinit var job: Job
@@ -17,6 +25,8 @@ class MainActivity : AppCompatActivity() {
     private val PROGRESS_START= 0
     private val JOB_TIME = 4000 //ms
 
+
+    lateinit var viewModel:MainViewModel
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -31,8 +41,20 @@ class MainActivity : AppCompatActivity() {
         }
 
 
+        viewModel = ViewModelProvider(this).get(MainViewModel::class.java)
+        viewModel.user.observe(this, Observer{
+            Log.d("dbg", it.toString())
+            Log.d("dbg", "abc")
+        })
+
+        viewModel.setUserId("1")
+
     }
 
+    override fun onDestroy() {
+        super.onDestroy()
+        viewModel.cancelJob()
+    }
 
     //kotlin extension function
     fun ProgressBar.startJobOrCancel(job:Job){
